@@ -1,0 +1,182 @@
+from random import randint
+from cryptography.fernet import Fernet
+
+key = 'BgUhIkobyf2xo4VZDm5VuW672zWzF5Jwzn0gY74LmzQ='
+
+loads = input('Load (L) or Start new game (S)')
+
+
+def encrypt(filename, key):
+    f = Fernet(key)
+    with open(filename, 'rb') as file:
+        file_data = file.read()
+        encrypted_data = f.encrypt(file_data)
+    with open(filename, 'wb') as file:
+        file.write(encrypted_data)
+
+
+def decrypt(filename, key):
+    f = Fernet(key)
+    with open(filename, 'rb') as file:
+        encrypted_data = file.read()
+    decrypted_data = f.decrypt(encrypted_data)
+    with open(filename, 'wb') as file:
+        file.write(decrypted_data)
+
+
+def save():
+    global H, W, game, key
+    with open("top1game2021extremeshooterbrawlstars2newchessupdate2003.ru", "w") as file:
+        file.write(str(H) + " " + str(W) + "\n")
+        for y in range(H):
+            for x in range(W):
+                file.write(str(game[y][x][0]) + " " + str(game[y][x][1]) + "\n")
+
+    encrypt("top1game2021extremeshooterbrawlstars2newchessupdate2003.ru", key)
+
+
+def load():
+    global game, H, W, key
+    decrypt("top1game2021extremeshooterbrawlstars2newchessupdate2003.ru", key)
+    with open("top1game2021extremeshooterbrawlstars2newchessupdate2003.ru", "r") as file:
+        H, W = [int(i) for i in file.readline().split()]
+        for i in range(H):
+            game.append([])
+            for j in range(W):
+                game[i].append([])
+                a, b = [(i) for i in file.readline().split()]
+                if b != 'F':
+                    a, b = int(a), int(b)
+                else:
+                    a = int(a)
+
+                game[i][j] = [a, b]
+
+
+def init_bombs():
+    global game, BOMBS, W, H
+    for _ in range(BOMBS):
+        y, x = randint(0, H - 1), randint(0, W - 1)
+        game[y][x][1] = -1
+
+
+def init_nums():
+    global game, BOMBS, W, H
+    for y in range(H):
+        for x in range(W):
+            if game[y][x][1] != -1:
+                game[y][x][1] = count(y, x)
+
+
+def count(y, x):
+    global game, W, H
+    counter = 0
+
+    addy, addx = 0, 0
+    if min(H - 1, y + 1) + 1 <= H:
+        addy = 1
+    if min(W - 1, x + 1) + 1 <= W:
+        addx = 1
+    for y1 in range(max(0, y - 1), min(H - 1, y + 1) + addy):
+        for x1 in range(max(0, x - 1), min(W - 1, x + 1) + addx):
+            if (y1, x1) != (y, x):
+                if game[y1][x1][1] == -1:
+                    counter += 1
+    return counter
+
+
+def prints():
+    global H, W, game
+    for y in range(H):
+        for x in range(W):
+            print("* " if game[y][x][0] == 0 else str(game[y][x][1]) + " ", end="")
+        print()
+    print("-" * W)
+
+
+def turn(y, x, task):
+    global H, W, game, FL_COUNT
+
+    if task == 'O':
+        game[y][x][0] = 1
+        if game[y][x][1] == -1:
+            return 0
+        else:
+            return 1
+    elif task == 'F' and FL_COUNT > 0:
+        game[y][x][0] = 1
+        if task == 'F':
+            game[y][x][0] = 1
+            game[y][x][1] = 'F'
+            FL_COUNT -= 1
+            return 1
+    elif FL_COUNT <= 0:
+        return 0
+
+
+def end():
+    global game, W, H
+    for y in range(H):
+        for x in range(W):
+            if game[y][x][0] == 0:
+                return 0
+    return 1
+
+
+game = []
+H, W = 0, 0
+if loads == 'S':
+    H, W, BOMBS = [int(i) for i in input("Height Length Bombs").split()]
+    FL_COUNT = BOMBS
+    game = []
+    for i in range(H):
+        game.append([])
+        for j in range(W):
+            game[i].append([0, 0])
+    init_bombs()
+    init_nums()
+
+elif loads == 'L':
+
+    load()
+
+while True:
+    prints()
+    xin, yin, task = [i for i in input().split()]
+    if task == 'Save':
+        save()
+        exit(0)
+    xin, yin = int(xin) - 1, int(yin) - 1
+    res = turn(yin, xin, task)
+    if end():
+        print("██─██─████─█─█")
+        print("─███──█──█─█─█")
+        print("──█───█──█─█─█")
+        print("──█───█──█─█─█")
+        print("──█───████─███")
+        print("──█")
+        print("")
+        print("█───█─███─█──█")
+        print("█───█──█──██─█")
+        print("█─█─█──█──█─██")
+        print("█████──█──█──█")
+        print("─█─█──███─█──█")
+        exit(0)
+    if not res and task == 'F':
+        print("YOU ARE OUT OF FLAGS")
+    elif not res and task == 'O':
+        print("████████████████")
+        print("█──█──█────█─█─█")
+        print("██───██─██─█─█─█")
+        print("███─███─██─█─█─█")
+        print("███─███─██─█─█─█")
+        print("███─███────█───█")
+        print("███─████████████")
+        print("██████████████████")
+        print("█─███────█───█───█")
+        print("█─███─██─█─███─███")
+        print("█─███─██─█───█───█")
+        print("█─███─██─███─█─███")
+        print("█───█────█───█───█")
+        print("██████████████████")
+        exit(0)
