@@ -25,9 +25,9 @@ def decrypt(filename, key):
 
 
 def save():
-    global H, W, game, key
+    global H, W, game, key, FL_COUNT
     with open("top1game2021extremeshooterbrawlstars2newchessupdate2003.ru", "w") as file:
-        file.write(str(H) + " " + str(W) + "\n")
+        file.write(str(H) + " " + str(W) + " " + str(FL_COUNT) + "\n")
         for y in range(H):
             for x in range(W):
                 file.write(str(game[y][x][0]) + " " + str(game[y][x][1]) + "\n")
@@ -36,10 +36,10 @@ def save():
 
 
 def load():
-    global game, H, W, key
+    global game, H, W, key, FL_COUNT
     decrypt("top1game2021extremeshooterbrawlstars2newchessupdate2003.ru", key)
     with open("top1game2021extremeshooterbrawlstars2newchessupdate2003.ru", "r") as file:
-        H, W = [int(i) for i in file.readline().split()]
+        H, W, FL_COUNT = [int(i) for i in file.readline().split()]
         for i in range(H):
             game.append([])
             for j in range(W):
@@ -103,7 +103,7 @@ def turn(y, x, task):
             return 0
         else:
             return 1
-    elif task == 'F' and FL_COUNT > 0:
+    elif task == 'Flag' and FL_COUNT > 0:
         game[y][x][0] = 1
         if task == 'F':
             game[y][x][0] = 1
